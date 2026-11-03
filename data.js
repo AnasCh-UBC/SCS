@@ -1,15 +1,5 @@
 // Course content. Edit freely: each lecture = {t:title, pts:[bullets], w:widgetKey, q:[{q,o:[options],a:correctIndex,e:explanation}]}
 const LECTURES=[
-{t:"Introduction",w:"sys",pts:[
-"Communication = delivering information from a source (transmitter) to a destination (receiver) in a recognizable form.",
-"System elements: <b>source → transmitter → channel → receiver → sink</b>. The channel (wire, fiber, free space…) distorts the signal and adds noise/interference.",
-"The transmitter uses resources: power, bandwidth, time, space/antennas, computation, infrastructure. Efficient schemes usually involve trade-offs.",
-"Classifications: analog vs digital, wired vs wireless, single- vs multi-user, uplink/downlink (full- or half-duplex).",
-"This course: analog communication (radio/TV broadcasting, and a building block of digital systems). Signals &amp; systems first, communication systems afterwards.",
-"Outline: signals → Fourier series/transform → LTI systems &amp; convolution → AM → angle modulation → sampling &amp; quantization → intro to digital communication."],
-q:[{q:"Which element of a communication system adds random distortion/noise?",o:["Source","Transmitter","Channel","Sink"],a:2,e:"The channel is the physical medium and corrupts the transmitted waveform."},
-{q:"Analog modulation (e.g. AM, FM) is used to transmit…",o:["Bits only","Continuous signals directly","Only text files","Nothing; it is obsolete"],a:1,e:"Analog communication sends continuous signals directly using analog modulation."}]},
-
 {t:"Review of Signals",w:"sig",pts:[
 "A signal is a quantity (voltage, current, field…) varying with an independent variable such as time.",
 "Key signals: sinusoid <code>A cos(2πf₀t+θ)</code>, unit step u(t), rectangular pulse Π(t), triangle Λ(t), sinc(t)=sin(πt)/(πt), impulse δ(t).",

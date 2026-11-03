@@ -1,5 +1,5 @@
-const $=s=>document.querySelector(s),st=JSON.parse(localStorage.getItem('apsc270')||'{}');
-const save=()=>{try{localStorage.setItem('apsc270',JSON.stringify(st))}catch(e){}};
+const $=s=>document.querySelector(s),st=JSON.parse(localStorage.getItem('apsc270v2')||'{}');
+const save=()=>{try{localStorage.setItem('apsc270v2',JSON.stringify(st))}catch(e){}};
 const done=i=>st[i]&&st[i].length===LECTURES[i].q.length&&st[i].every(x=>x);
 function plot(c,ser,x0,x1,y0,y1,r){const x=c.getContext('2d'),w=c.width,oy=r?r[0]:0,hh=r?r[1]:c.height,
  X=t=>(t-x0)/(x1-x0)*w,Y=v=>oy+hh-(v-y0)/(y1-y0)*hh,css=getComputedStyle(document.body);
@@ -40,13 +40,32 @@ function quiz(i){const L=LECTURES[i],box=document.createElement('div');box.class
   d.querySelector('button').onclick=()=>{const s=d.querySelector('input:checked'),fb=d.querySelector('.fb');if(!s){fb.textContent='Pick an answer first.';return}
    const ok=+s.value===q.a;st[i][j]=ok||st[i][j];save();fb.className='fb '+(ok?'ok':'bad');fb.textContent=ok?'✓ Correct. '+q.e:'✗ Not quite – try again.';nav()};
   if(st[i][j]){d.querySelector('.fb').className='fb ok';d.querySelector('.fb').textContent='✓ Done'}box.appendChild(d)});return box}
-function nav(){const n=$('#nav'),cur=+(location.hash.slice(1))||0;
- n.innerHTML=LECTURES.map((l,i)=>`<a href="#${i}" class="${i==cur?'on':''}">${done(i)?'✓':'○'} L${i+1} · ${l.t}</a>`).join('');
- $('#prog').textContent=LECTURES.filter((_,i)=>done(i)).length+'/'+LECTURES.length+' complete'}
-function show(){const i=Math.min(+(location.hash.slice(1))||0,LECTURES.length-1),L=LECTURES[i],m=$('#main');
- m.innerHTML=`<h2>Lecture ${i+1}: ${L.t}</h2><div class="card"><ul>${L.pts.map(p=>`<li>${p}</li>`).join('')}</ul></div>`;
+const P=h=>`<p>${h}</p>`,FG=k=>`<div class="fig">${FIG[k]()}</div>`;
+function nav(){const cur=location.hash.slice(1),n=$('#nav');
+ n.innerHTML=`<a href="#" class="${cur===''?'on':''}">⌂ Cover &amp; course overview</a>`+LECTURES.map((l,i)=>`<a href="#${i}" class="${cur!==''&&+cur===i?'on':''}">${done(i)?'✓':'○'} L${i+2} · ${l.t}</a>`).join('');
+ $('#prog').textContent=LECTURES.filter((_,i)=>done(i)).length+'/'+LECTURES.length+' modules complete'}
+function home(){const m=$('#main');
+ m.innerHTML=`<section class="cover"><h1>APSC 270 – Signals and Communication Systems</h1>
+<div class="card inst"><div><b>Dr. Anas Chaaban, P.Eng.</b><br>School of Engineering, University of British Columbia (UBC)<br>✉ <a href="mailto:anas.chaaban@ubc.ca">anas.chaaban@ubc.ca</a><br>Office: EME 3215 · Tuesdays 11–4 pm (email first to confirm)</div>
+<ul><li><b>Education:</b> BSc Lebanese Univ. 2006; MASc Univ. Ulm 2009; PhD Ruhr-Univ. Bochum 2013</li><li><b>Experience:</b> postdoctoral work at Ruhr-Univ. Bochum and KAUST; professor at UBC since 2018; collaborations with Daimler AG, Hella, FortisBC, TELUS, Rogers, KFAerospace…</li><li><b>Research:</b> wireless communications and sensing (radio-frequency, optical, acoustic) and information theory</li></ul></div>
+<div class="hero">${FIG.hero()}</div></section>
+<h2>What is this course about?</h2>
+${P('<b>Communication</b> is the task of delivering information from a source (transmitter) to a destination (receiver) in a <b>recognizable form</b>. Information comes as audio, video, text and more, and the systems that carry it include broadcast (radio, TV), wired (telephone, cable), mobile (satellite, cellular) and networked systems (internet, sensors, IoT). This course covers the underlying techniques that make these systems work.')}
+<h3>Elements of a communication system</h3>
+<ul><li><b>Source</b> – generates the information (analog: voice, video; digital: text, files).</li><li><b>Transmitter</b> – converts it into an electrical/electromagnetic/optical signal suited to the channel, using resources such as power, bandwidth, time, space (antennas), computation and infrastructure. Good schemes use these efficiently, which often means trade-offs.</li><li><b>Channel</b> – the physical medium (wire, fibre, free space, air, water). It <b>distorts</b> the signal with random noise/interference.</li><li><b>Receiver</b> – extracts the transmitted information from the distorted signal. Building the transmit signal and processing the received one relies on signals-and-systems concepts, covered here.</li></ul>
+${FG('ch')}<div id="introw"></div>
+<h3>Classifying communication systems</h3>
+<ul><li><b>Analog vs digital</b> – continuous signals sent directly with <i>analog modulation</i> (AM, FM) versus discrete signals (bits) sent with <i>digital modulation</i>.</li><li><b>Wired vs wireless</b>; <b>single-user</b> (point-to-point) vs <b>multi-user</b> (broadcasting, multicasting); direction: uplink/downlink, full- or half-duplex; also bandwidth, range, power…</li></ul>
+${FG('ad')}
+<h3>Why analog communication?</h3>
+${P('Analog communication developed mainly in the early 20th century and is still used for radio and TV broadcasting. It is also a building block of digital systems, and many digital-communication developments build on analog concepts. Cables (twisted pair, coaxial), radio waves and acoustic waves can all carry analog signals. The course helps with understanding RF integrated circuits, digital communication and wireless networking, with emerging applications such as biomedical engineering and IoT, with jobs in the telecom industry, and with graduate studies and internships. Expect a fair amount of mathematics, plus implementation of schemes in GNU Radio and software-defined radios (SDR).')}
+<h3>Roadmap</h3>${FG('road')}
+<h2>Course modules</h2><div class="grid">${LECTURES.map((l,i)=>`<a class="lc" href="#${i}">${THUMBS[i]()}<div class="tx"><b>Lecture ${i+2}: ${l.t}</b><span>${BL[i]}</span></div></a>`).join('')}</div>`;
+ m.querySelector('#introw').appendChild(widget('sys'));nav();$('#nav').classList.remove('open');scrollTo(0,0)}
+function show(){if(location.hash.slice(1)==='')return home();const i=Math.min(+(location.hash.slice(1))||0,LECTURES.length-1),L=LECTURES[i],m=$('#main');
+ m.innerHTML=`<h2>Lecture ${i+2}: ${L.t}</h2><div class="thumb">${THUMBS[i]()}</div><div class="card"><ul>${L.pts.map(p=>`<li>${p}</li>`).join('')}</ul></div>`;
  if(L.w)m.appendChild(widget(L.w));m.appendChild(quiz(i));
- const p=document.createElement('div');p.className='pn';p.innerHTML=(i?`<a href="#${i-1}">← Previous</a>`:'<span></span>')+(i<LECTURES.length-1?`<a href="#${i+1}">Next →</a>`:'<span></span>');m.appendChild(p);
+ const p=document.createElement('div');p.className='pn';p.innerHTML=(i?`<a href="#${i-1}">← Previous</a>`:'<a href="#">← Cover</a>')+(i<LECTURES.length-1?`<a href="#${i+1}">Next →</a>`:'<span></span>');m.appendChild(p);
  m.insertAdjacentHTML('beforeend','<p class="mut">Study notes based on APSC 270 lecture slides (Dr. A. Chaaban, UBC). Always defer to the original slides and course materials.</p>');
  nav();$('#nav').classList.remove('open');scrollTo(0,0)}
 
