@@ -2,10 +2,299 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>APSC 270 – Signals and Communication Systems</title>
-<link rel="stylesheet" href="style.css"></head>
+<style>:root{--bg:#fff;--fg:#1b1f2a;--mut:#5b6475;--card:#f3f5fa;--acc:#0b3d91;--ok:#17803d;--bad:#b3261e;--ln:#d5d9e3}
+@media(prefers-color-scheme:dark){:root{--bg:#12151c;--fg:#e8eaf0;--mut:#9aa3b5;--card:#1b2030;--acc:#7fa8ff;--ok:#5fd38d;--bad:#ff8a80;--ln:#2e3547}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,sans-serif}
+header{position:sticky;top:0;z-index:5;display:flex;gap:12px;align-items:center;padding:10px 16px;background:var(--acc);color:#fff}
+header h1{font-size:1rem;margin:0;flex:1}#menu{display:none;background:none;border:0;color:#fff;font-size:1.3rem}
+.layout{display:flex;max-width:1100px;margin:auto}
+nav{width:270px;padding:14px;border-right:1px solid var(--ln);position:sticky;top:46px;align-self:flex-start;height:calc(100vh - 46px);overflow:auto}
+nav a{display:block;padding:7px 10px;border-radius:8px;color:var(--fg);text-decoration:none;font-size:.92rem}
+nav a:hover{background:var(--card)}nav a.on{background:var(--card);color:var(--acc);font-weight:600}
+main{flex:1;padding:20px 24px;min-width:0}h2{margin-top:0;color:var(--acc)}h3{margin-bottom:6px}
+.card{background:var(--card);border-radius:12px;padding:14px 16px;margin:14px 0}
+ul{padding-left:20px}li{margin:4px 0}code,.m{font-family:ui-monospace,Menlo,monospace;background:var(--card);padding:1px 5px;border-radius:4px}
+.card code{background:var(--bg)}
+canvas{width:100%;height:auto;background:var(--bg);border:1px solid var(--ln);border-radius:8px}
+label{display:block;margin:8px 0 2px;font-size:.9rem}input[type=range]{width:100%}
+.q{margin:12px 0}.q p{margin:4px 0;font-weight:600}.q label{display:block;margin:3px 0;font-weight:400}
+button.b{background:var(--acc);color:var(--bg);border:0;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:.95rem}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.mut{color:var(--mut);font-size:.9rem}
+.pn{display:flex;justify-content:space-between;margin-top:24px}
+@media(max-width:760px){#menu{display:block}nav{display:none;position:fixed;top:46px;left:0;bottom:0;background:var(--bg);z-index:4;height:auto}nav.open{display:block}main{padding:14px}}
+header a{color:#fff;text-decoration:none}
+.cover h1{font-size:clamp(1.5rem,4vw,2.2rem);margin:0 0 12px;color:var(--acc)}
+.inst{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;font-size:.93rem}.inst ul{margin:0;padding-left:18px}
+.hero svg,.thumb svg,.fig svg{width:100%;height:auto;display:block;border-radius:12px}.thumb{margin:6px 0 14px;max-width:560px}.fig{max-width:620px;margin:10px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.lc{display:block;background:var(--card);border:1px solid var(--ln);border-radius:12px;overflow:hidden;color:var(--fg);text-decoration:none}
+.lc:hover{border-color:var(--acc)}.lc svg{display:block;width:100%;height:auto}.lc .tx{padding:10px 12px}.lc .tx span{display:block;font-size:.85rem;color:var(--mut)}
+footer{border-top:1px solid var(--ln);padding:14px 16px;text-align:center;font-size:.85rem;color:var(--mut)}footer a{color:var(--acc)}
+@media(max-width:760px){.inst{grid-template-columns:1fr}}
+h2{margin-top:30px}.cover h1{margin-top:0}.hero{margin-bottom:8px}.fig{margin:12px 0 18px}
+</style></head>
 <body>
 <header><button id="menu" aria-label="Menu">☰</button><h1><a href="#">APSC 270 – Signals and Communication Systems</a></h1><span id="prog"></span></header>
 <div class="layout"><nav id="nav"></nav><main id="main"></main></div>
-<footer>Instructor: <b>Dr. Anas Chaaban, P.Eng.</b> · School of Engineering, University of British Columbia (UBC) · <a href="mailto:anas.chaaban@ubc.ca">anas.chaaban@ubc.ca</a> · Office EME 3215<br>© Dr. Anas Chaaban</footer>
-<script src="data.js"></script><script src="thumbs.js"></script><script src="app.js"></script>
+<footer>Instructor: <b>Dr. Anas Chaaban, P.Eng.</b> · School of Engineering, University of British Columbia (UBC) · <a href="mailto:anas.chaaban@ubc.ca">anas.chaaban@ubc.ca</a> · Office EME 3215<br>© Dr. Anas Chaaban · <span class="mut">site build v4 (cover page, lecture thumbnails)</span></footer>
+<script>// Course content. Edit freely: each lecture = {t:title, pts:[bullets], w:widgetKey, q:[{q,o:[options],a:correctIndex,e:explanation}]}
+const LECTURES=[
+{t:"Review of Signals",w:"sig",pts:[
+"A signal is a quantity (voltage, current, field…) varying with an independent variable such as time.",
+"Key signals: sinusoid <code>A cos(2πf₀t+θ)</code>, unit step u(t), rectangular pulse Π(t), triangle Λ(t), sinc(t)=sin(πt)/(πt), impulse δ(t).",
+"Impulse: ∫δ=1; sifting x(t)δ(t−t₀)=x(t₀)δ(t−t₀); sampling ∫x(t)δ(t−t₀)dt=x(t₀); δ(t)=du/dt.",
+"Operations: time shift x(t−t₀) (delay for t₀&gt;0), time reversal x(−t), time scaling x(at) (a&gt;1 contracts).",
+"Classes: continuous/discrete time, deterministic/random, periodic (x(t)=x(t+T₀)), causal/noncausal, even/odd, energy-type/power-type.",
+"Energy Eₓ=∫|x|²dt; power Pₓ=lim (1/T)∫|x|²dt. Nonzero power ⇒ infinite energy.",
+"Complex signals: Euler <code>e^{jφ}=cosφ+j sinφ</code>; cos φ=(e^{jφ}+e^{−jφ})/2. Real signals in practice, but complex notation is convenient."],
+q:[{q:"x(t−2) compared with x(t) is…",o:["Advanced by 2","Delayed by 2","Compressed by 2","Reversed"],a:1,e:"For t₀>0, x(t−t₀) is shifted right, i.e. delayed."},
+{q:"A periodic signal with nonzero finite power has…",o:["Finite energy","Infinite energy","Zero energy","Undefined power"],a:1,e:"Nonzero power implies infinite energy."},
+{q:"∫x(t)δ(t−t₀)dt equals…",o:["x(0)","δ(t₀)","x(t₀)","1"],a:2,e:"Sampling property of the impulse."}]},
+
+{t:"Review of Systems",w:"conv",pts:[
+"A system maps an input x(t) to an output y(t)=𝒯[x(t)]. Examples: differentiator, amplifier y=ax, filter.",
+"<b>Linear</b>: 𝒯[a₁x₁+a₂x₂]=a₁𝒯[x₁]+a₂𝒯[x₂]. y=x² is nonlinear.",
+"<b>Time-invariant</b>: delayed input ⇒ delayed output. A modulator y=x(t)cos(2πf₀t) is time-variant.",
+"<b>Causal</b>: output depends only on present and past input. A causal LTI system has a causal impulse response h(t).",
+"An <b>LTI</b> system is fully characterized by its impulse response h(t); output is the convolution <code>y(t)=x(t)⊛h(t)=∫x(τ)h(t−τ)dτ</code>.",
+"Convolution recipe: draw x(τ), h(τ) → flip &amp; shift h to h(t−τ) → multiply &amp; integrate.",
+"Properties: commutative, associative, distributive; x⊛δ=x.",
+"Complex sinusoids are <b>eigenfunctions</b> of LTI systems: e^{j2πf₀t} → H(f₀)e^{j2πf₀t}, with H(f₀)=∫h(τ)e^{−j2πf₀τ}dτ."],
+q:[{q:"Which system is time-variant?",o:["y=ax(t)","y=dx/dt","y=x(t)cos(2πf₀t)","y=x(t−1)"],a:2,e:"Multiplying by a time-dependent carrier breaks time invariance."},
+{q:"The output of an LTI system with impulse response h(t) is…",o:["x·h","x⊛h","x+h","dx/dt"],a:1,e:"Convolution of input and impulse response."},
+{q:"Complex sinusoids passing through an LTI system…",o:["Change frequency","Keep frequency, change amplitude/phase","Become real","Vanish"],a:1,e:"Eigenfunction property: scaled by H(f₀)."}]},
+
+{t:"Fourier Series",w:"four",pts:[
+"A periodic x(t) (period T₀=1/f₀) can be written <code>x(t)=Σₖ xₖ e^{j2πkf₀t}</code> – a sum of harmonically related complex sinusoids.",
+"Coefficients: <code>xₖ=(1/T₀)∫₍T₀₎ x(t)e^{−j2πkf₀t}dt</code>. Example: cos(2πf₀t) has xₖ=½ for k=±1, else 0.",
+"Real x(t) ⇒ x₋ₖ=xₖ* (Hermitian): |xₖ| even, ∠xₖ odd. Even signals have only cosine terms; odd signals only sine terms.",
+"Spectrum plots: magnitude |xₖ| vs k, phase ∠xₖ vs k, power |xₖ|² vs k.",
+"Dirichlet conditions (sufficient): absolutely integrable over a period; finite maxima/minima and finite discontinuities per period.",
+"LTI response to a periodic input: output coefficients are <code>xₖH(kf₀)</code> – no new frequencies appear.",
+"Parseval: (1/T₀)∫|x|²dt = Σ|xₖ|² – power is conserved."],
+q:[{q:"If x(t) is real, its Fourier coefficients satisfy…",o:["x₋ₖ=xₖ","x₋ₖ=−xₖ","x₋ₖ=xₖ*","xₖ=0 for k<0"],a:2,e:"Hermitian symmetry."},
+{q:"A periodic signal passes through an LTI system. The k-th output coefficient is…",o:["xₖ","xₖH(kf₀)","xₖ+H(kf₀)","H(xₖ)"],a:1,e:"Each harmonic is scaled by the frequency response at kf₀."}]},
+
+{t:"Fourier Transform",w:"ft",pts:[
+"For nonperiodic signals: <code>X(f)=∫x(t)e^{−j2πft}dt</code>, inverse <code>x(t)=∫X(f)e^{j2πft}df</code>.",
+"|X(f)| = amplitude spectrum, ∠X(f) = phase spectrum. Real x(t) ⇒ X(−f)=X*(f). Real &amp; even ⇒ X real &amp; even; real &amp; odd ⇒ X imaginary &amp; odd.",
+"Bandwidth: width of the frequency range where |X(f)|≠0; baseband signals have f_L≈0.",
+"Pairs: Π(t)↔sinc(f); δ(t)↔1; 1↔δ(f); Λ(t)↔sinc²(f); cos(2πf₀t)↔½δ(f−f₀)+½δ(f+f₀); e^{−αt}u(t)↔1/(α+j2πf).",
+"Properties: linearity, duality, time shift ↔ e^{−j2πft₀}X(f), scaling x(at)↔(1/|a|)X(f/a), modulation e^{j2πf₀t}x(t)↔X(f−f₀), convolution ↔ multiplication, differentiation ↔ (j2πf)ⁿX(f).",
+"Parseval: ∫|x|²dt=∫|X|²df; |X(f)|² is the energy spectral density.",
+"LTI systems: <code>Y(f)=H(f)X(f)</code>. Ideal LPF/HPF/BPF have H=1 in the pass band and 0 elsewhere (a linear phase e^{−j2πft_d} is still ideal)."],
+q:[{q:"The Fourier transform of Π(t) is…",o:["sinc(f)","Π(f)","1","sinc²(f)"],a:0,e:"A unit rectangular pulse transforms to a sinc."},
+{q:"Multiplying x(t) by e^{j2πf₀t} does what to the spectrum?",o:["Scales it","Shifts it by f₀","Reverses it","Nothing"],a:1,e:"Modulation property: X(f−f₀)."},
+{q:"Expanding a signal in time (a<1) makes its spectrum…",o:["Wider","Narrower","Unchanged","Imaginary"],a:1,e:"Time scaling: compression in time ⇒ expansion in frequency, and vice versa."}]},
+
+{t:"Double-Sideband AM",w:"am",pts:[
+"Modulation turns a lowpass message m(t) (bandwidth W) into a bandpass signal near carrier f_c: x(t)=A(t)cos(2πf_ct+φ(t)). AM varies A(t); angle modulation varies φ(t).",
+"Why modulate: match channel/regulation, use smaller antennas, allow multiple transmitters on different f_c, trade bandwidth for noise immunity.",
+"<b>DSB-SC</b>: x(t)=A_c m(t)cos(2πf_ct); X(f)=(A_c/2)[M(f−f_c)+M(f+f_c)]; bandwidth 2W; power P=(A_c²/2)P_m.",
+"Coherent demodulation: multiply by cos(2πf_ct+φ) then LPF → (A_c/2)m(t)cosφ. φ=π/2 makes the message vanish ⇒ need synchronization (pilot tone or PLL).",
+"<b>Conventional AM</b>: x(t)=A_c[1+a·mₙ(t)]cos(2πf_ct), |mₙ|≤1, index a∈(0,1) ⇒ envelope follows the message ⇒ simple envelope detector.",
+"Conventional AM power: (A_c²/2)a²P_mₙ + A_c²/2 (carrier) – less efficient than DSB-SC.",
+"Envelope detector needs 1/f_c ≪ RC ≪ 1/W. Too small RC ⇒ ripple; too large ⇒ output stuck.",
+"Implementations: power-law (nonlinear device + BPF) modulator; balanced modulator (difference of two conventional AM signals = DSB-SC)."],
+q:[{q:"Bandwidth of a DSB AM signal with message bandwidth W is…",o:["W","2W","4W","W/2"],a:1,e:"Both sidebands are transmitted."},
+{q:"In coherent DSB-SC demodulation, a 90° LO phase error gives…",o:["Half the power","No distortion","Zero output","Double output"],a:2,e:"The output is scaled by cos φ; cos(π/2)=0."},
+{q:"Why must |a·mₙ(t)| ≤ 1 in conventional AM?",o:["To save power","So the envelope stays non-negative and detectable","To shift f_c","To reduce bandwidth"],a:1,e:"Otherwise it is over-modulated and an envelope detector fails."}]},
+
+{t:"Frequency Modulation",w:"fm",pts:[
+"Angle modulation: x(t)=A_c cos(2πf_ct+φ(t)); instantaneous frequency f_i=f_c+(1/2π)dφ/dt.",
+"PM: φ=k_p m(t). FM: frequency deviation Δf(t)=k_f m(t), so φ(t)=2πk_f∫m(τ)dτ. FM of m = PM of ∫m.",
+"Benefits: better noise immunity than AM and constant envelope (good with nonlinear amplifiers). Carson showed FM needs more bandwidth; Armstrong showed its noise immunity.",
+"Modulation index <code>β_f = k_f max|m(t)| / W</code>. For m=a cos(2πf_mt): β=k_f a/f_m.",
+"Spectrum for sinusoidal m: <code>Σ A_c Jₙ(β)cos(2π(f_c+nf_m)t)</code> (Bessel functions); ΣJₙ²=1; infinitely many components.",
+"<b>Carson's rule</b>: effective bandwidth B=2(β+1)W (≈98% of power). Narrowband FM β≪1 (B≈2W); wideband β≫1.",
+"Commercial FM: 200 kHz spacing, 75 kHz peak deviation. 1G cellular used FM.",
+"Generation: direct (VCO) or indirect (narrowband FM + frequency multiplier). Demodulation: differentiator + envelope detector (discriminator) or a PLL."],
+q:[{q:"Carson's rule gives bandwidth B =",o:["2W","2(β+1)W","(β+1)W/2","βW"],a:1,e:"B=2(β_f+1)W."},
+{q:"An FM modulator fed with dm/dt produces…",o:["An AM signal","A PM signal","DSB-SC","Noise"],a:1,e:"Differentiating before FM gives PM."},
+{q:"k_f=3, max|m|=1, W=1. β_f is…",o:["1","3","6","0.33"],a:1,e:"β = k_f·max|m|/W = 3."}]},
+
+{t:"Sampling &amp; Reconstruction",w:"samp",pts:[
+"Digital systems need discrete time <i>and</i> discrete amplitude: sampler → quantizer.",
+"Uniform sampling: x_s(t)=Σx(nT_s)δ(t−nT_s), f_s=1/T_s. Spectrum = copies of X(f) every f_s: (1/T_s)ΣX(f−n/T_s).",
+"<b>Nyquist theorem</b>: a signal bandlimited to W can be reconstructed if f_s ≥ 2W (the Nyquist rate is 2W).",
+"Reconstruction: sinc interpolation x(t)=Σx_d[n]sinc(t/T_s−n) for T_s=1/(2W) – equivalent to an ideal LPF.",
+"If f_s &lt; 2W the replicas overlap: <b>aliasing</b>. Sample above 2W to leave a guard band because real filters are not ideal.",
+"Non-bandlimited signals: apply an <b>antialiasing LPF</b> first. Speech: filter ≤4 kHz, sample 8 kHz. Music: up to 20 kHz, sample 44.1 kHz.",
+"Quantization: m-bit ⇒ 2^m levels (e.g. 3 bits → 0…7). ADC = sampler + quantizer; analog→discrete-time quantized signal is <b>PCM</b>. Practical samplers use sample-and-hold."],
+q:[{q:"x(t)=cos(2πt) has W=1 Hz. The minimum sampling rate for reconstruction is…",o:["1 Hz","2 Hz","4/3 Hz","10 Hz"],a:1,e:"Nyquist rate 2W=2 Hz."},
+{q:"Aliasing occurs when…",o:["f_s>2W","f_s<2W","Quantizing with many bits","The LPF is ideal"],a:1,e:"Spectral replicas overlap."},
+{q:"How many levels does 8-bit quantization have?",o:["8","64","255","256"],a:3,e:"2⁸=256 (values 0…255)."}]},
+
+{t:"SSB AM &amp; Broadcasting",w:"super",pts:[
+"Real m(t) ⇒ M(f) Hermitian, so one sideband carries all the information. SSB sends one sideband (bandwidth W instead of 2W).",
+"Method 1: DSB-SC followed by a sharp BPF. Method 2: Hilbert filter H(f)=−j·sign(f), <code>x(t)=A_c m(t)cos(2πf_ct) ± A_c m̃(t)sin(2πf_ct)</code> (− USB, + LSB).",
+"SSB demodulation is coherent; LO phase error leaves a distortion term ∝ m̃(t)sinφ; a pilot tone helps.",
+"<b>VSB</b>: a non-ideal BPF keeps a vestige of the other sideband. Works if H(f−f_c)+H(f+f_c)=constant for |f|≤W. Used for TV (preserves DC).",
+"<b>AM radio</b>: conventional AM, 535–1605 kHz, 10 kHz channels (W=5 kHz). Superheterodyne receiver converts any station to a fixed IF = 455 kHz; f_LO=f_c+f_IF.",
+"Image channel at f_c′=f_c+2f_IF is removed by the RF amplifier. Example: f_c=740 kHz ⇒ f_LO=1195 kHz, image=1650 kHz.",
+"<b>FM radio</b>: 88–108 MHz, 200 kHz spacing, 75 kHz deviation, IF=10.7 MHz; limiter removes amplitude noise, discriminator demodulates.",
+"Stereo FM: L+R and L−R (DSB-AM at a higher subcarrier) + pilot, then FM; receiver recovers L and R by adding/subtracting."],
+q:[{q:"Superheterodyne AM receiver tuned to 740 kHz (IF 455 kHz) has f_LO =",o:["285 kHz","740 kHz","1195 kHz","1650 kHz"],a:2,e:"f_LO=f_c+f_IF=1195 kHz; image is at 1650 kHz."},
+{q:"SSB AM bandwidth for message bandwidth W is…",o:["W","2W","W/2","4W"],a:0,e:"Only one sideband is sent."},
+{q:"Why is VSB used for TV?",o:["It needs more bandwidth","It allows DC values without sharp filtering","It is FM","It removes the carrier"],a:1,e:"Images need DC; VSB avoids the sharp cutoff of SSB."}]},
+
+{t:"Multiplexing &amp; Noise",w:"iq",pts:[
+"<b>Multiplexing</b> combines simultaneous transmissions: quadrature-carrier, frequency-division (FDM), time-division (TDM).",
+"<b>Quadrature-carrier (I/Q)</b>: x(t)=m_I cos(2πf_ct)−m_Q sin(2πf_ct)=Re[m(t)e^{j2πf_ct}], m=m_I+jm_Q. Two AM signals share the same band without interference. SDR hardware (USRP) uses this; PSK/QAM build on it.",
+"AM: m_Q=0. FM: m_I=cos φ, m_Q=sin φ. SSB: m_Q=±m̃.",
+"<b>FDM</b>: each message modulates its own carrier, BPFs separate them. For DSB, carrier spacing must exceed 2W.",
+"<b>Noise</b>: random signal; thermal noise has a flat PSD S(f)=N₀/2 with N₀=kT (&lsquo;white&rsquo;). Power = integral of the PSD over the band.",
+"DSB AM with bandlimited noise: n=n_c cos−n_s sin; after demod y=½A_c m+½n_c; <b>SNR = Pₓ/(N₀W)</b>. SSB has the same SNR; conventional AM is lower by the factor a²P_mₙ/(1+a²P_mₙ).",
+"Angle modulation: noise effect is ∝1/A_c – raising carrier amplitude reduces it (unlike AM). FM/PM SNR scales with (Ω/2−1)²·Pₓ/(N₀W) where Ω=2(β+1).",
+"Trade-offs: SSB-SC most bandwidth-efficient; FM most power-efficient (noise immunity); conventional AM and FM are simple to build."],
+q:[{q:"A flat power spectral density is called…",o:["Pink noise","White noise","Quantization noise","Aliasing"],a:1,e:"Thermal noise is white: S(f)=N₀/2."},
+{q:"In FDM with DSB AM (message bandwidth W), carrier spacing must be…",o:["< W","= W","> 2W","irrelevant"],a:2,e:"Each DSB signal occupies 2W."},
+{q:"Increasing A_c in FM…",o:["Does nothing","Reduces the effect of noise","Increases noise effect","Doubles bandwidth"],a:1,e:"Noise effect is inversely proportional to A_c in angle modulation."}]}
+];
+
+// Blue-on-dark "futuristic" SVG figures: lecture thumbnails + cover-page figures
+const C1='#1d6dff',C2='#38bdf8',C3='#7dd3fc',C4='#4f6bff';
+const sinc2=x=>x==0?1:Math.sin(Math.PI*x)/(Math.PI*x),nz=x=>.6*Math.sin(x*3.7)+.5*Math.sin(x*7.9+1)+.4*Math.sin(x*13.1+2)+.3*Math.sin(x*23.3);
+const PA=(f,a,b,n)=>{let d='';for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;d+=(i?'L':'M')+x.toFixed(1)+' '+f(x).toFixed(1)}return d};
+const PL=(d,c,w=2,ex='')=>`<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" filter="url(#gl)" ${ex}/>`;
+const TX=(x,y,s,sz=12,an='start',c=C3)=>`<text x="${x}" y="${y}" fill="${c}" font-family="ui-monospace,Menlo,monospace" font-size="${sz}" text-anchor="${an}">${s}</text>`;
+const BX=(x,y,w,h,c=C2)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="rgba(29,109,255,.14)" stroke="${c}" stroke-width="1.6" filter="url(#gl)"/>`;
+const AR=(x1,y1,x2,y2,c=C2)=>`<path d="M${x1} ${y1}L${x2} ${y2}" stroke="${c}" stroke-width="1.8" filter="url(#gl)"/><path d="M${x2-7} ${y2-5}L${x2} ${y2}L${x2-7} ${y2+5}" fill="none" stroke="${c}" stroke-width="1.8"/>`;
+function SV(w,h,inner,label){let g='';for(let x=0;x<=w;x+=20)g+=`M${x} 0V${h}`;for(let y=0;y<=h;y+=20)g+=`M0 ${y}H${w}`;
+ return `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${label}"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#040a18"/><stop offset="1" stop-color="#0b1f4a"/></linearGradient><filter id="gl" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="1.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><rect width="${w}" height="${h}" fill="url(#bg)"/><path d="${g}" stroke="${C1}" stroke-opacity=".13" stroke-width="1" fill="none"/>${inner}</svg>`}
+const THUMBS=[
+()=>SV(400,200,PL(PA(x=>45+16*Math.cos(x/12),20,380,200),C3,1.5,'stroke-dasharray="4 4" opacity=".6"')+PL(PA(x=>115-60*sinc2((x-200)/28),20,380,360),C2,2.5)+PL('M20 180H120V150H380',C1,2.5)+TX(24,24,'x(t)')+TX(376,24,'u(t) · Π(t) · sinc(t)',11,'end'),'Signals'),
+()=>SV(400,200,BX(150,28,100,46)+TX(200,57,'h(t)',17,'middle')+AR(60,51,150,51)+AR(250,51,340,51)+TX(20,45,'x(t)',13)+TX(344,45,'y(t)',13)+'<polygon points="100,170 137,130 140,130 140,170" fill="'+C3+'" opacity=".35"/>'+PL('M40 170V130H140V170',C1,2.2)+PL('M100 170L160 105L220 170',C2,2.2)+PL('M250 170L300 120L350 170',C3,2,'stroke-dasharray="4 3"')+TX(300,100,'x ⊛ h',13,'middle')+PL('M30 170H370',C4,1),'Systems'),
+()=>{const w=2*Math.PI/180;return SV(400,200,PL('M20 140V60H110V140H200V60H290V140H380',C3,1.5,'stroke-dasharray="4 4" opacity=".6"')+PL(PA(x=>100-(4/Math.PI)*40*[1,3,5,7].reduce((s,k)=>s+Math.sin(k*w*(x-20))/k,0),20,380,540),C2,2.5)+TX(24,188,'x(t)=Σ xₖ e^(j2πkf₀t)',12),'Fourier series')},
+()=>SV(400,200,PL('M20 150H60V70H150V150H190',C1,2.5)+AR(192,110,218,110)+TX(205,100,'F',13,'middle')+PL('M220 150H380',C4,1)+PL(PA(x=>150-80*sinc2((x-300)/16),220,380,300),C2,2.5)+TX(105,178,'x(t)',13,'middle')+TX(300,178,'X(f)',13,'middle'),'Fourier transform'),
+()=>{const e=x=>1+.6*Math.cos((x-20)/360*3*Math.PI);return SV(400,200,PL(PA(x=>100-31*e(x)*Math.cos((x-20)*2*Math.PI/9),20,380,720),C2,1.2)+PL(PA(x=>100-31*e(x),20,380,180),C3,1.5,'stroke-dasharray="4 3"')+PL(PA(x=>100+31*e(x),20,380,180),C3,1.5,'stroke-dasharray="4 3"')+TX(24,24,'x(t)=A_c[1+a·m(t)]cos(2πf_c t)',11),'AM')},
+()=>SV(400,200,PL(PA(x=>96-46*Math.cos((x-20)*2*Math.PI/10+9*Math.sin((x-20)*4*Math.PI/360)),20,380,900),C2,1.2)+PL(PA(x=>172-14*Math.cos((x-20)*4*Math.PI/360),20,380,180),C3,1.8,'stroke-dasharray="4 3"')+TX(24,24,'cos(2πf_c t + φ(t))',12),'FM'),
+()=>{let s='';for(let x=20;x<=380;x+=20){const y=100-55*Math.sin((x-20)*2*Math.PI/180);s+=PL(`M${x} 100V${y.toFixed(1)}`,C3,1.5)+`<circle cx="${x}" cy="${y.toFixed(1)}" r="3.5" fill="${C3}" filter="url(#gl)"/>`}
+ return SV(400,200,PL(PA(x=>100-55*Math.sin((x-20)*2*Math.PI/180),20,380,360),C2,1.6,'opacity=".6"')+s+TX(24,188,'x(nT_s)   f_s ≥ 2W',12),'Sampling')},
+()=>SV(400,200,PL('M30 150H280',C4,1)+PL('M110 150L170 70V150',C1,1.5,'opacity=".5"')+PL('M170 70V150',C1,1.5,'opacity=".5"')+'<path d="M170 150V70L230 150Z" fill="'+C2+'" fill-opacity=".25"/>'+PL('M170 150V70L230 150',C2,2.6)+TX(170,172,'f_c',12,'middle')+TX(205,64,'USB',12,'middle')+TX(135,64,'LSB',12,'middle',C4)+PL('M330 40V150M310 150L330 60L350 150M318 118H342',C3,1.8)+PL('M346 45Q362 60 346 75M354 36Q380 60 354 84',C2,1.6)+TX(24,24,'SSB · broadcasting',12),'SSB and broadcasting'),
+()=>SV(400,200,'<rect x="40" y="90" width="70" height="60" fill="'+C1+'" fill-opacity=".3"/><rect x="140" y="90" width="70" height="60" fill="'+C2+'" fill-opacity=".3"/><rect x="240" y="90" width="70" height="60" fill="'+C3+'" fill-opacity=".3"/>'+PL('M40 150V90H110V150M140 150V90H210V150M240 150V90H310V150',C2,2)+PL(PA(x=>140+6*nz(x),20,380,360),C4,1.2)+TX(75,172,'f₁',12,'middle')+TX(175,172,'f₂',12,'middle')+TX(275,172,'f₃',12,'middle')+TX(24,24,'FDM  +  noise N₀/2',12),'Multiplexing and noise')];
+const BL=["Sinusoids, step, pulse, impulse; shifts, scaling, energy and power; complex signals.","Linear time-invariant systems, impulse response and convolution.","Periodic signals as sums of harmonics; spectra and LTI response.","Spectra of nonperiodic signals; properties and filtering.","DSB-SC and conventional AM, coherent and envelope detection.","Phase and frequency modulation, Carson's bandwidth.","Nyquist theorem, aliasing, reconstruction and quantization (PCM).","SSB, VSB, AM/FM radio and the superheterodyne receiver.","I/Q and frequency-division multiplexing, noise and SNR."];
+const FIG={
+hero(){const X0=[20,190,360,530,700],N=['Information|Source','Transmitter|(modulator)','Channel|h(t) + noise','Receiver|(demodulator)','Information|Sink'],CP=['voice · image · text','AM · FM','wire · fibre · air','filter · demod','recovered m̂(t)'],
+ m=u=>(Math.sin(4*Math.PI*u)+.4*Math.sin(12*Math.PI*u))/1.4,am=u=>(1+.6*m(u))*Math.sin(36*Math.PI*u)/1.6,
+ W=[m,am,u=>am(u)+.35*nz(u*220),u=>m(u)+.12*nz(u*220),m];let s=PL('M20 62H880',C4,.8,'opacity=".5"')+PL('M20 282H880',C4,.8,'stroke-dasharray="3 5" opacity=".5"')+TX(30,36,'x(t) = A cos(2πf₀t + θ)',14)+TX(870,36,'ANALOG COMMUNICATION SYSTEM',13,'end',C2);
+ X0.forEach((x,i)=>{s+=PL(PA(px=>112-24*W[i]((px-x)/140),x,x+140,280),i==2?C3:C2,1.6)+BX(x,170,140,56,i==2?C3:C2)+TX(x+70,193,N[i].split('|')[0],13,'middle')+TX(x+70,211,N[i].split('|')[1],12,'middle',C2)+TX(x+70,248,CP[i],11,'middle',C4);if(i<4)s+=AR(x+142,198,x+168,198)});
+ return SV(900,330,s+TX(430,157,'↓ n(t)',13,'middle')+TX(20,308,'y(t) = x(t) ⊛ h(t)',13)+TX(450,308,'X(f) = ∫ x(t) e^(−j2πft) dt',13,'middle')+TX(880,308,'f_s ≥ 2W',13,'end'),'Block diagram of an analog communication system')},
+ad(){const b=[1,0,1,1,0,1,0,0];let d='M300 120',y=120;b.forEach((v,i)=>{const t=v?60:120;d+=`V${t}H${300+(i+1)*30}`});
+ return SV(560,170,PL(PA(x=>90-35*Math.sin((x-20)*2*Math.PI/125),20,270,250),C2,2.4)+PL('M285 20V150',C4,1,'stroke-dasharray="4 4"')+PL(d,C3,2.4)+TX(145,28,'analog',13,'middle')+TX(145,152,'continuous in time and amplitude',11,'middle',C4)+TX(420,28,'digital',13,'middle')+TX(420,152,'discrete time, discrete amplitude (bits)',11,'middle',C4),'Analog versus digital signal')},
+ch(){return SV(560,170,PL(PA(x=>100-35*Math.sin((x-20)/150*6*Math.PI),20,170,150),C2,2)+AR(180,100,213,100)+BX(215,68,130,64)+TX(280,95,'channel',13,'middle')+TX(280,115,'+ noise n(t)',11,'middle',C2)+AR(347,100,380,100)+PL(PA(x=>100-35*Math.sin((x-380)/150*6*Math.PI)-12*nz(x),380,540,300),C3,1.4)+TX(95,150,'x(t)',12,'middle')+TX(460,150,'y(t) = x(t) + n(t)',12,'middle'),'Channel distortion')},
+road(){const L=['Signals','Fourier','LTI &amp; conv.','AM','FM / PM','Sampling','Digital'];let s=PL('M50 45H668',C4,1.5);L.forEach((l,i)=>{const x=50+103*i;s+=`<circle cx="${x}" cy="45" r="13" fill="#061230" stroke="${C2}" stroke-width="1.8" filter="url(#gl)"/>`+TX(x,50,i+1,13,'middle')+TX(x,88,l,11,'middle')});return SV(720,110,s,'Course roadmap')}};
+THUMBS.forEach((f,i)=>{THUMBS[i]=()=>f().replace(/font-size="(\d+)"/g,(a,n)=>`font-size="${Math.round(n*1.4)}"`)});
+
+const $=s=>document.querySelector(s),st=JSON.parse(localStorage.getItem('apsc270v2')||'{}');
+const save=()=>{try{localStorage.setItem('apsc270v2',JSON.stringify(st))}catch(e){}};
+const done=i=>st[i]&&st[i].length===LECTURES[i].q.length&&st[i].every(x=>x);
+function plot(c,ser,x0,x1,y0,y1,r){const x=c.getContext('2d'),w=c.width,oy=r?r[0]:0,hh=r?r[1]:c.height,
+ X=t=>(t-x0)/(x1-x0)*w,Y=v=>oy+hh-(v-y0)/(y1-y0)*hh,css=getComputedStyle(document.body);
+ if(!r)x.clearRect(0,0,w,c.height);x.save();x.beginPath();x.rect(0,oy,w,hh);x.clip();
+ x.lineWidth=1;x.strokeStyle=css.getPropertyValue('--ln');x.beginPath();x.moveTo(0,Y(0));x.lineTo(w,Y(0));x.stroke();
+ ser.forEach(s=>{x.strokeStyle=x.fillStyle=s.c;x.lineWidth=s.lw||2;x.setLineDash(s.d||[]);
+  if(s.stem){s.pts.forEach(([t,v])=>{x.beginPath();x.moveTo(X(t),Y(0));x.lineTo(X(t),Y(v));x.stroke();x.beginPath();x.arc(X(t),Y(v),4,0,7);x.fill()})}
+  else{x.beginPath();let n=0,lx=0;for(let i=0;i<=w;i++){const t=x0+i/w*(x1-x0);if(s.to!==undefined&&t>s.to)break;const v=s.f(t);n++?x.lineTo(i,Y(v)):x.moveTo(i,Y(v));lx=i}
+   if(s.fill){x.lineTo(lx,Y(0));x.lineTo(0,Y(0));x.closePath();x.globalAlpha=.3;x.fill();x.globalAlpha=1}else x.stroke()}});x.restore();x.setLineDash([])}
+const A='#2f6fe0',R='#e0562f',G='#2fa05a';
+const sinc=x=>x==0?1:Math.sin(Math.PI*x)/(Math.PI*x);
+const WID={
+four:{t:"Try it: build a square wave from harmonics",sl:[["K","Number of harmonics K",0,40,1,3]],
+ d(c,v){const K=v.K,xk=k=>Math.sin(Math.PI*k/2)/(Math.PI*k),f=t=>{let s=.5;for(let k=1;k<=K;k++)s+=2*xk(k)*Math.cos(2*Math.PI*k*t);return s};
+  plot(c,[{f:t=>Math.abs(((t%1)+1.5)%1-.5)<.25?1:0,c:R,d:[5,4],lw:1.5},{f,c:A}],-1,1,-.4,1.4);
+  return`Square wave (T₀=1, width ½): x₀=½, xₖ=sin(πk/2)/(πk). Red dashed = target, blue = x̂(t) with K=${K}. Note the overshoot near jumps persists (Gibbs) while the fit improves with K.`}},
+am:{t:"Try it: conventional AM and the modulation index",sl:[["a","Modulation index a",.1,1.6,.05,.7]],
+ d(c,v){const a=v.a,m=t=>Math.cos(2*Math.PI*t),f=t=>(1+a*m(t))*Math.cos(2*Math.PI*14*t);
+  plot(c,[{f,c:A,lw:1},{f:t=>1+a*m(t),c:R,d:[4,3]},{f:t=>-(1+a*m(t)),c:R,d:[4,3]}],0,2,-2.8,2.8);
+  return a>1?`<span class="bad">a=${a.toFixed(2)} &gt; 1: over-modulated. The envelope no longer equals 1+a·m(t); an envelope detector would distort.</span>`:
+  `a=${a.toFixed(2)}: the red envelope 1+a·mₙ(t) stays ≥ 0, so an envelope detector recovers the message. Carrier power share = 1/(1+a²P_m).`}},
+fm:{t:"Try it: FM waveform and Carson's bandwidth",sl:[["b","Modulation index β",0,10,.5,3]],
+ d(c,v){const b=v.b;plot(c,[{f:t=>Math.cos(2*Math.PI*10*t+b*Math.sin(2*Math.PI*t)),c:A,lw:1.2},{f:t=>.9*Math.sin(2*Math.PI*t),c:R,d:[4,3],lw:1.2}],0,2,-1.3,1.3);
+  return`Message m(t)=cos(2πf_m t) (red dashed). β=${b}: with W=f_m, Carson bandwidth B=2(β+1)W = <b>${(2*(b+1)).toFixed(1)}·f_m</b>. Larger β ⇒ faster frequency swings and more bandwidth.`}},
+samp:{t:"Try it: sampling, Nyquist and aliasing",sl:[["f0","Signal frequency f₀ (Hz)",.5,5,.5,1],["fs","Sampling rate f_s (Hz)",.5,14,.5,10]],
+ d(c,v){const{f0,fs}=v,fa=Math.abs(f0-Math.round(f0/fs)*fs),pts=[];for(let n=0;n/fs<=4;n++)pts.push([n/fs,Math.cos(2*Math.PI*f0*n/fs)]);
+  const ok=fs>=2*f0;plot(c,[{f:t=>Math.cos(2*Math.PI*f0*t),c:A,lw:1.5},{pts,stem:1,c:R},...(ok?[]:[{f:t=>Math.cos(2*Math.PI*fa*t),c:G,d:[5,4],lw:1.5}])],0,4,-1.3,1.3);
+  return ok?`f_s=${fs} ≥ 2f₀=${2*f0}: Nyquist satisfied, the signal can be reconstructed.`:`<span class="bad">f_s=${fs} &lt; 2f₀=${2*f0}: aliasing! Samples also fit a ${fa} Hz cosine (green dashed).</span>`}}};
+function widget(k){const w=WID[k],id='w'+k,div=document.createElement('div');div.className='card';
+ div.innerHTML=`<h3>${w.t}</h3><canvas id="${id}" width="720" height="${w.h||260}"></canvas>`+(w.sel||[]).map(s=>`<label>${s[1]}: <select data-k="${s[0]}">${s[2].map((o,i)=>`<option value="${i}"${i==(s[3]||0)?' selected':''}>${o}</option>`).join('')}</select></label>`).join('')+w.sl.map(s=>`<label>${s[1]}: <b id="${id}${s[0]}"></b><input type="range" data-k="${s[0]}" min="${s[2]}" max="${s[3]}" step="${s[4]}" value="${s[5]}"></label>`).join('')+`<p class="mut" id="${id}n"></p>`;
+ const up=()=>{const v={};div.querySelectorAll('input,select').forEach(i=>{v[i.dataset.k]=+i.value;const b=div.querySelector('#'+id+i.dataset.k);if(b)b.textContent=i.value});
+  div.querySelector('#'+id+'n').innerHTML=w.d(div.querySelector('canvas'),v)};
+ div.addEventListener('input',up);setTimeout(up,0);return div}
+function quiz(i){const L=LECTURES[i],box=document.createElement('div');box.className='card';box.innerHTML='<h3>Check your understanding</h3>';
+ st[i]=st[i]||L.q.map(()=>false);
+ L.q.forEach((q,j)=>{const d=document.createElement('div');d.className='q';
+  d.innerHTML=`<p>${j+1}. ${q.q}</p>`+q.o.map((o,k)=>`<label><input type="radio" name="q${i}_${j}" value="${k}"> ${o}</label>`).join('')+'<button class="b">Check</button> <span class="fb"></span>';
+  d.querySelector('button').onclick=()=>{const s=d.querySelector('input:checked'),fb=d.querySelector('.fb');if(!s){fb.textContent='Pick an answer first.';return}
+   const ok=+s.value===q.a;st[i][j]=ok||st[i][j];save();fb.className='fb '+(ok?'ok':'bad');fb.textContent=ok?'✓ Correct. '+q.e:'✗ Not quite – try again.';nav()};
+  if(st[i][j]){d.querySelector('.fb').className='fb ok';d.querySelector('.fb').textContent='✓ Done'}box.appendChild(d)});return box}
+const P=h=>`<p>${h}</p>`,FG=k=>`<div class="fig">${FIG[k]()}</div>`;
+function nav(){const cur=location.hash.slice(1),n=$('#nav');
+ n.innerHTML=`<a href="#" class="${cur===''?'on':''}">⌂ Cover &amp; course overview</a>`+LECTURES.map((l,i)=>`<a href="#${i}" class="${cur!==''&&+cur===i?'on':''}">${done(i)?'✓':'○'} L${i+2} · ${l.t}</a>`).join('');
+ $('#prog').textContent=LECTURES.filter((_,i)=>done(i)).length+'/'+LECTURES.length+' modules complete'}
+function home(){const m=$('#main');
+ m.innerHTML=`<section class="cover"><h1>APSC 270 – Signals and Communication Systems</h1>
+<div class="card inst"><div><b>Dr. Anas Chaaban, P.Eng.</b><br>School of Engineering, University of British Columbia (UBC)<br>✉ <a href="mailto:anas.chaaban@ubc.ca">anas.chaaban@ubc.ca</a><br>Office: EME 3215 · Tuesdays 11–4 pm (email first to confirm)</div>
+<ul><li><b>Education:</b> BSc Lebanese Univ. 2006; MASc Univ. Ulm 2009; PhD Ruhr-Univ. Bochum 2013</li><li><b>Experience:</b> postdoctoral work at Ruhr-Univ. Bochum and KAUST; professor at UBC since 2018; collaborations with Daimler AG, Hella, FortisBC, TELUS, Rogers, KFAerospace…</li><li><b>Research:</b> wireless communications and sensing (radio-frequency, optical, acoustic) and information theory</li></ul></div>
+<div class="hero">${FIG.hero()}</div></section>
+<h2>What is this course about?</h2>
+${P('<b>Communication</b> is the task of delivering information from a source (transmitter) to a destination (receiver) in a <b>recognizable form</b>. Information comes as audio, video, text and more, and the systems that carry it include broadcast (radio, TV), wired (telephone, cable), mobile (satellite, cellular) and networked systems (internet, sensors, IoT). This course covers the underlying techniques that make these systems work.')}
+<h3>Elements of a communication system</h3>
+<ul><li><b>Source</b> – generates the information (analog: voice, video; digital: text, files).</li><li><b>Transmitter</b> – converts it into an electrical/electromagnetic/optical signal suited to the channel, using resources such as power, bandwidth, time, space (antennas), computation and infrastructure. Good schemes use these efficiently, which often means trade-offs.</li><li><b>Channel</b> – the physical medium (wire, fibre, free space, air, water). It <b>distorts</b> the signal with random noise/interference.</li><li><b>Receiver</b> – extracts the transmitted information from the distorted signal. Building the transmit signal and processing the received one relies on signals-and-systems concepts, covered here.</li></ul>
+${FG('ch')}<div id="introw"></div>
+<h3>Classifying communication systems</h3>
+<ul><li><b>Analog vs digital</b> – continuous signals sent directly with <i>analog modulation</i> (AM, FM) versus discrete signals (bits) sent with <i>digital modulation</i>.</li><li><b>Wired vs wireless</b>; <b>single-user</b> (point-to-point) vs <b>multi-user</b> (broadcasting, multicasting); direction: uplink/downlink, full- or half-duplex; also bandwidth, range, power…</li></ul>
+${FG('ad')}
+<h3>Why analog communication?</h3>
+${P('Analog communication developed mainly in the early 20th century and is still used for radio and TV broadcasting. It is also a building block of digital systems, and many digital-communication developments build on analog concepts. Cables (twisted pair, coaxial), radio waves and acoustic waves can all carry analog signals. The course helps with understanding RF integrated circuits, digital communication and wireless networking, with emerging applications such as biomedical engineering and IoT, with jobs in the telecom industry, and with graduate studies and internships. Expect a fair amount of mathematics, plus implementation of schemes in GNU Radio and software-defined radios (SDR).')}
+<h3>Roadmap</h3>${FG('road')}
+<h2>Course modules</h2><div class="grid">${LECTURES.map((l,i)=>`<a class="lc" href="#${i}">${THUMBS[i]()}<div class="tx"><b>Lecture ${i+2}: ${l.t}</b><span>${BL[i]}</span></div></a>`).join('')}</div>`;
+ m.querySelector('#introw').appendChild(widget('sys'));nav();$('#nav').classList.remove('open');scrollTo(0,0)}
+function show(){if(location.hash.slice(1)==='')return home();const i=Math.min(+(location.hash.slice(1))||0,LECTURES.length-1),L=LECTURES[i],m=$('#main');
+ m.innerHTML=`<h2>Lecture ${i+2}: ${L.t}</h2><div class="thumb">${THUMBS[i]()}</div><div class="card"><ul>${L.pts.map(p=>`<li>${p}</li>`).join('')}</ul></div>`;
+ if(L.w)m.appendChild(widget(L.w));m.appendChild(quiz(i));
+ const p=document.createElement('div');p.className='pn';p.innerHTML=(i?`<a href="#${i-1}">← Previous</a>`:'<a href="#">← Cover</a>')+(i<LECTURES.length-1?`<a href="#${i+1}">Next →</a>`:'<span></span>');m.appendChild(p);
+ m.insertAdjacentHTML('beforeend','<p class="mut">Study notes based on APSC 270 lecture slides (Dr. A. Chaaban, UBC). Always defer to the original slides and course materials.</p>');
+ nav();$('#nav').classList.remove('open');scrollTo(0,0)}
+
+const SIG=[["Rectangle Π(t)",t=>Math.abs(t)<=.5?1:0],["Triangle Λ(t)",t=>Math.max(0,1-Math.abs(t))],["Ramp t on (0,1)",t=>t>0&&t<1?t:0],["Decaying e^(−t)·u(t)",t=>t>=0?Math.exp(-t):0]],SN=SIG.map(s=>s[0]);
+let sd=7;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647,NZ=Array.from({length:722},()=>Math.sqrt(-2*Math.log(rnd()+1e-9))*Math.cos(2*Math.PI*rnd()));
+Object.assign(WID,{
+sys:{t:"Try it: source → channel → receiver",h:280,sl:[["snr","Channel SNR (dB)",-5,30,1,10],["k","Receiver smoothing window (samples)",1,81,2,1]],
+ d(c,v){const P=.625,sg=Math.sqrt(P/Math.pow(10,v.snr/10)),m=t=>Math.cos(2*Math.PI*t)+.5*Math.sin(6*Math.PI*t),idx=t=>Math.round(t/2*720),rx=i=>m(i/360)+sg*NZ[Math.max(0,Math.min(721,i))],h2=(v.k-1)/2,
+  fl=t=>{let a=0;for(let j=-h2;j<=h2;j++)a+=rx(idx(t)+j);return a/v.k};
+  plot(c,[{f:t=>rx(idx(t)),c:A,lw:1},{f:m,c:R,d:[5,4]},...(v.k>1?[{f:fl,c:G,lw:2.5}]:[])],0,2,-3.5,3.5);
+  return`Red dashed = transmitted message, blue = what the receiver gets (channel adds noise), green = receiver recovery. A wider window removes more noise but starts to distort the message – a receiver design trade-off.`}},
+sig:{t:"Try it: shift, reverse and scale a signal",sel:[["s","Signal x(t)",SN,0]],sl:[["t0","Shift t₀ (delay if >0)",-2,2,.25,0],["a","Scale a (>1 contracts)",.25,3,.25,1],["r","Time reversal (0=off, 1=on)",0,1,1,0]],
+ d(c,v){const x=SIG[v.s][1],sg=v.r?-1:1;plot(c,[{f:x,c:R,d:[5,4]},{f:t=>x(sg*v.a*(t-v.t0)),c:A}],-4,4,-.3,1.4);
+  return`Blue: y(t)=x(${v.r?'−':''}${v.a}·(t−${v.t0})), red dashed: x(t). Try each control alone: a shift moves the shape right (delay) or left, a>1 squeezes it, reversal flips it about t=0.`}},
+conv:{t:"Try it: convolution y(t)=x(t)⊛h(t) step by step",h:380,sel:[["x","Input x(τ)",SN,0],["h","Impulse response h(τ)",SN,1]],sl:[["t","Time t",-3,5,.1,.5]],
+ d(c,v){const x=SIG[v.x][1],h=SIG[v.h][1],cv=t=>{let a=0;for(let u=-5;u<7;u+=.02)a+=x(u)*h(t-u)*.02;return a},hs=t=>h(v.t-t);
+  let ym=.01;for(let t=-3;t<=5;t+=.1)ym=Math.max(ym,cv(t));const cur=cv(v.t);c.getContext('2d').clearRect(0,0,720,380);
+  plot(c,[{f:t=>x(t)*hs(t),c:G,fill:1,lw:1},{f:x,c:A},{f:hs,c:R}],-3,5,-.2,1.3,[0,190]);
+  plot(c,[{f:cv,c:A,lw:1,d:[3,3]},{f:cv,c:A,lw:3,to:v.t},{pts:[[v.t,cur]],stem:1,c:R}],-3,5,-.15*ym,1.2*ym,[200,180]);
+  return`Top: x(τ) (blue), flipped &amp; shifted h(t−τ) (red), and their product (green area). Bottom: y(t) is that area, traced out as t moves. At t=${v.t.toFixed(1)}: y=<b>${cur.toFixed(3)}</b>.`}},
+ft:{t:"Try it: scaling, shifting and modulation of a pulse",h:340,sl:[["tau","Pulse width τ",.25,3,.25,1],["t0","Time shift t₀",-1.5,1.5,.25,0],["f0","Modulate with cos(2πf₀t), f₀",0,4,.5,0]],
+ d(c,v){const{tau,t0,f0}=v,xt=t=>Math.abs((t-t0)/tau)<=.5?Math.cos(2*Math.PI*f0*t):0,
+  A_=g=>{const s=tau*sinc(g*tau),p=2*Math.PI*g*t0;return[s*Math.cos(p),-s*Math.sin(p)]},
+  X=f=>{const a=A_(f-f0),b=A_(f+f0);return Math.hypot(a[0]+b[0],a[1]+b[1])/2};c.getContext('2d').clearRect(0,0,720,340);
+  plot(c,[{f:xt,c:A,lw:1.5}],-3,3,-1.4,1.4,[0,150]);plot(c,[{f:X,c:R,fill:1}],-8,8,-.1*tau-.02,1.15*tau,[170,170]);
+  return`Top: x(t)=Π((t−t₀)/τ)·cos(2πf₀t). Bottom: |X(f)|. <b>Scaling</b>: widening the pulse (τ↑) narrows the spectrum (main lobe ≈ 2/τ wide). <b>Shift</b>: t₀ changes only the phase, |X(f)| stays identical. <b>Modulation</b>: |X(f)| moves to ±f₀.`}},
+super:{t:"Try it: superheterodyne receiver – image frequency",h:300,sl:[["fc","Desired station f_c (kHz)",540,1600,10,740],["fi","Intermediate frequency f_IF (kHz)",100,1000,5,455]],
+ d(c,v){const{fc,fi}=v,lo=fc+fi,im=fc+2*fi,x=c.getContext('2d'),w=c.width,mx=Math.max(2200,im+300),X=f=>30+f/mx*(w-60),fg=getComputedStyle(document.body).getPropertyValue('--fg');
+  x.clearRect(0,0,w,300);x.font='13px system-ui';x.fillStyle='rgba(120,140,200,.2)';x.fillRect(X(535),30,X(1605)-X(535),100);
+  const ax=y=>{x.strokeStyle=fg;x.lineWidth=1;x.setLineDash([]);x.beginPath();x.moveTo(30,y);x.lineTo(w-30,y);x.stroke()},
+   bar=(f,y,hh,col,l,dy)=>{x.strokeStyle=x.fillStyle=col;x.lineWidth=4;x.beginPath();x.moveTo(X(f),y);x.lineTo(X(f),y-hh);x.stroke();x.fillText(l,Math.min(X(f)-20,w-130),y-hh-4-(dy||0))};
+  x.fillStyle=fg;x.fillText('Before mixer (RF)  – shaded: AM band 535–1605 kHz',30,18);ax(130);bar(fc,130,70,A,'desired '+fc);bar(lo,130,45,G,'LO '+lo);bar(im,130,70,R,'image '+im,0);
+  x.fillStyle=fg;x.fillText('After mixer (IF)',30,175);ax(270);bar(fi,270,70,A,'desired → '+fi,16);bar(fi,270,50,R,'image → '+fi);
+  [0,500,1000,1500,2000].filter(f=>f<mx).forEach(f=>{x.fillStyle=fg;x.fillText(f,X(f)-10,146);x.fillText(f,X(f)-10,286)});
+  return`f_LO = f_c+f_IF = <b>${lo} kHz</b>; image f_c′ = f_c+2f_IF = <b>${im} kHz</b>. Both f_LO−f_c and f_c′−f_LO equal ${fi} kHz, so the mixer cannot tell them apart. ${im<=1605?'<span class="bad">The image lies inside the AM band: the RF amplifier must reject it before mixing.</span>':'The image is above the AM band, so it is easy to reject.'}`}},
+iq:{t:"Try it: I/Q multiplexing and LO phase error",h:320,sl:[["p","Receiver LO phase error φ (degrees)",0,90,5,0]],
+ d(c,v){const p=v.p*Math.PI/180,mi=t=>Math.cos(2*Math.PI*t),mq=t=>Math.sin(4*Math.PI*t);c.getContext('2d').clearRect(0,0,720,320);
+  plot(c,[{f:t=>mi(t)/2,c:R,d:[5,4]},{f:t=>(mi(t)*Math.cos(p)+mq(t)*Math.sin(p))/2,c:A}],0,2,-.7,.7,[0,155]);
+  plot(c,[{f:t=>mq(t)/2,c:R,d:[5,4]},{f:t=>(-mi(t)*Math.sin(p)+mq(t)*Math.cos(p))/2,c:G}],0,2,-.7,.7,[165,155]);
+  return`Two independent messages share one carrier: x(t)=m_I cos(2πf_ct)−m_Q sin(2πf_ct). Top: I-branch output (blue) vs the target m_I/2 (red dashed). Bottom: Q-branch (green) vs m_Q/2. With φ=0 there is no interference; with φ=${v.p}° each branch loses cos φ=${Math.cos(p).toFixed(2)} of its message and picks up sin φ=${Math.sin(p).toFixed(2)} of the other.`}}});
+$('#menu').onclick=()=>$('#nav').classList.toggle('open');
+addEventListener('hashchange',show);show();
+</script>
 </body></html>
