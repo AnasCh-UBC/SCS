@@ -32,13 +32,19 @@ header a{color:#fff;text-decoration:none}
 footer{border-top:1px solid var(--ln);padding:14px 16px;text-align:center;font-size:.85rem;color:var(--mut)}footer a{color:var(--acc)}
 @media(max-width:760px){.inst{grid-template-columns:1fr}}
 h2{margin-top:30px}.cover h1{margin-top:0}.hero{margin-bottom:8px}.fig{margin:12px 0 18px}
+
+.layout{display:block;max-width:960px;margin:auto}header{flex-wrap:wrap}header select{padding:6px 8px;border-radius:8px;border:0;font:inherit;font-size:.9rem;max-width:100%;background:#fff;color:#1b1f2a}
 </style></head>
 <body>
-<header><button id="menu" aria-label="Menu">☰</button><h1><a href="#">APSC 270 – Signals and Communication Systems</a></h1><span id="prog"></span></header>
-<div class="layout"><nav id="nav"></nav><main id="main"></main></div>
-<footer>Instructor: <b>Dr. Anas Chaaban, P.Eng.</b> · School of Engineering, University of British Columbia (UBC) · <a href="mailto:anas.chaaban@ubc.ca">anas.chaaban@ubc.ca</a> · Office EME 3215<br>© Dr. Anas Chaaban · <span class="mut">site build v4 (cover page, lecture thumbnails)</span></footer>
+<header><h1><a href="#">APSC 270 – Signals and Communication Systems</a></h1><select id="jump" aria-label="Go to lecture"></select><span id="prog"></span></header>
+<div class="layout"><main id="main"></main></div>
+<footer>Instructor: <b>Dr. Anas Chaaban, P.Eng.</b> · School of Engineering, University of British Columbia (UBC) · <a href="mailto:anas.chaaban@ubc.ca">anas.chaaban@ubc.ca</a><br>© Dr. Anas Chaaban · <span class="mut">site build v5</span></footer>
 <script>// Course content. Edit freely: each lecture = {t:title, pts:[bullets], w:widgetKey, q:[{q,o:[options],a:correctIndex,e:explanation}]}
 const LECTURES=[
+{t:"Introduction",intro:1,w:"sys",
+q:[{q:"Which element of a communication system adds random distortion/noise?",o:["Source","Transmitter","Channel","Sink"],a:2,e:"The channel is the physical medium and corrupts the transmitted waveform."},
+{q:"Analog modulation (e.g. AM, FM) is used to transmit…",o:["Bits only","Continuous signals directly","Only text files","Nothing; it is obsolete"],a:1,e:"Analog communication sends continuous signals directly using analog modulation."}]},
+
 {t:"Review of Signals",w:"sig",pts:[
 "A signal is a quantity (voltage, current, field…) varying with an independent variable such as time.",
 "Key signals: sinusoid <code>A cos(2πf₀t+θ)</code>, unit step u(t), rectangular pulse Π(t), triangle Λ(t), sinc(t)=sin(πt)/(πt), impulse δ(t).",
@@ -184,10 +190,12 @@ ad(){const b=[1,0,1,1,0,1,0,0];let d='M300 120',y=120;b.forEach((v,i)=>{const t=
  return SV(560,170,PL(PA(x=>90-35*Math.sin((x-20)*2*Math.PI/125),20,270,250),C2,2.4)+PL('M285 20V150',C4,1,'stroke-dasharray="4 4"')+PL(d,C3,2.4)+TX(145,28,'analog',13,'middle')+TX(145,152,'continuous in time and amplitude',11,'middle',C4)+TX(420,28,'digital',13,'middle')+TX(420,152,'discrete time, discrete amplitude (bits)',11,'middle',C4),'Analog versus digital signal')},
 ch(){return SV(560,170,PL(PA(x=>100-35*Math.sin((x-20)/150*6*Math.PI),20,170,150),C2,2)+AR(180,100,213,100)+BX(215,68,130,64)+TX(280,95,'channel',13,'middle')+TX(280,115,'+ noise n(t)',11,'middle',C2)+AR(347,100,380,100)+PL(PA(x=>100-35*Math.sin((x-380)/150*6*Math.PI)-12*nz(x),380,540,300),C3,1.4)+TX(95,150,'x(t)',12,'middle')+TX(460,150,'y(t) = x(t) + n(t)',12,'middle'),'Channel distortion')},
 road(){const L=['Signals','Fourier','LTI &amp; conv.','AM','FM / PM','Sampling','Digital'];let s=PL('M50 45H668',C4,1.5);L.forEach((l,i)=>{const x=50+103*i;s+=`<circle cx="${x}" cy="45" r="13" fill="#061230" stroke="${C2}" stroke-width="1.8" filter="url(#gl)"/>`+TX(x,50,i+1,13,'middle')+TX(x,88,l,11,'middle')});return SV(720,110,s,'Course roadmap')}};
+THUMBS.unshift(()=>{let s='';['Source','Tx','Channel','Rx'].forEach((n,i)=>{const x=20+95*i;s+=BX(x,90,70,44,i==2?C3:C2)+TX(x+35,117,n,10,'middle')+PL(PA(px=>66-18*(i==1?(1+.5*Math.sin((px-x)/70*4*Math.PI))*Math.sin((px-x)*.9):i==2?Math.sin((px-x)*.9)+.5*nz(px):Math.sin((px-x)/70*4*Math.PI)),x,x+70,140),C2,1.4);if(i<3)s+=AR(x+72,112,x+93,112)});return SV(400,200,s+TX(205,160,'↓ n(t)',10,'middle')+TX(24,188,'source → transmitter → channel → receiver',10),'Communication system')});
+BL.unshift("What communication is, the elements of a communication system, and what the course covers.");
 THUMBS.forEach((f,i)=>{THUMBS[i]=()=>f().replace(/font-size="(\d+)"/g,(a,n)=>`font-size="${Math.round(n*1.4)}"`)});
 
-const $=s=>document.querySelector(s),st=JSON.parse(localStorage.getItem('apsc270v2')||'{}');
-const save=()=>{try{localStorage.setItem('apsc270v2',JSON.stringify(st))}catch(e){}};
+const $=s=>document.querySelector(s),st=JSON.parse(localStorage.getItem('apsc270v5')||'{}');
+const save=()=>{try{localStorage.setItem('apsc270v5',JSON.stringify(st))}catch(e){}};
 const done=i=>st[i]&&st[i].length===LECTURES[i].q.length&&st[i].every(x=>x);
 function plot(c,ser,x0,x1,y0,y1,r){const x=c.getContext('2d'),w=c.width,oy=r?r[0]:0,hh=r?r[1]:c.height,
  X=t=>(t-x0)/(x1-x0)*w,Y=v=>oy+hh-(v-y0)/(y1-y0)*hh,css=getComputedStyle(document.body);
@@ -229,15 +237,7 @@ function quiz(i){const L=LECTURES[i],box=document.createElement('div');box.class
    const ok=+s.value===q.a;st[i][j]=ok||st[i][j];save();fb.className='fb '+(ok?'ok':'bad');fb.textContent=ok?'✓ Correct. '+q.e:'✗ Not quite – try again.';nav()};
   if(st[i][j]){d.querySelector('.fb').className='fb ok';d.querySelector('.fb').textContent='✓ Done'}box.appendChild(d)});return box}
 const P=h=>`<p>${h}</p>`,FG=k=>`<div class="fig">${FIG[k]()}</div>`;
-function nav(){const cur=location.hash.slice(1),n=$('#nav');
- n.innerHTML=`<a href="#" class="${cur===''?'on':''}">⌂ Cover &amp; course overview</a>`+LECTURES.map((l,i)=>`<a href="#${i}" class="${cur!==''&&+cur===i?'on':''}">${done(i)?'✓':'○'} L${i+2} · ${l.t}</a>`).join('');
- $('#prog').textContent=LECTURES.filter((_,i)=>done(i)).length+'/'+LECTURES.length+' modules complete'}
-function home(){const m=$('#main');
- m.innerHTML=`<section class="cover"><h1>APSC 270 – Signals and Communication Systems</h1>
-<div class="card inst"><div><b>Dr. Anas Chaaban, P.Eng.</b><br>School of Engineering, University of British Columbia (UBC)<br>✉ <a href="mailto:anas.chaaban@ubc.ca">anas.chaaban@ubc.ca</a><br>Office: EME 3215 · Tuesdays 11–4 pm (email first to confirm)</div>
-<ul><li><b>Education:</b> BSc Lebanese Univ. 2006; MASc Univ. Ulm 2009; PhD Ruhr-Univ. Bochum 2013</li><li><b>Experience:</b> postdoctoral work at Ruhr-Univ. Bochum and KAUST; professor at UBC since 2018; collaborations with Daimler AG, Hella, FortisBC, TELUS, Rogers, KFAerospace…</li><li><b>Research:</b> wireless communications and sensing (radio-frequency, optical, acoustic) and information theory</li></ul></div>
-<div class="hero">${FIG.hero()}</div></section>
-<h2>What is this course about?</h2>
+const introHTML=()=>`<h3>What is this course about?</h3>
 ${P('<b>Communication</b> is the task of delivering information from a source (transmitter) to a destination (receiver) in a <b>recognizable form</b>. Information comes as audio, video, text and more, and the systems that carry it include broadcast (radio, TV), wired (telephone, cable), mobile (satellite, cellular) and networked systems (internet, sensors, IoT). This course covers the underlying techniques that make these systems work.')}
 <h3>Elements of a communication system</h3>
 <ul><li><b>Source</b> – generates the information (analog: voice, video; digital: text, files).</li><li><b>Transmitter</b> – converts it into an electrical/electromagnetic/optical signal suited to the channel, using resources such as power, bandwidth, time, space (antennas), computation and infrastructure. Good schemes use these efficiently, which often means trade-offs.</li><li><b>Channel</b> – the physical medium (wire, fibre, free space, air, water). It <b>distorts</b> the signal with random noise/interference.</li><li><b>Receiver</b> – extracts the transmitted information from the distorted signal. Building the transmit signal and processing the received one relies on signals-and-systems concepts, covered here.</li></ul>
@@ -247,15 +247,23 @@ ${FG('ch')}<div id="introw"></div>
 ${FG('ad')}
 <h3>Why analog communication?</h3>
 ${P('Analog communication developed mainly in the early 20th century and is still used for radio and TV broadcasting. It is also a building block of digital systems, and many digital-communication developments build on analog concepts. Cables (twisted pair, coaxial), radio waves and acoustic waves can all carry analog signals. The course helps with understanding RF integrated circuits, digital communication and wireless networking, with emerging applications such as biomedical engineering and IoT, with jobs in the telecom industry, and with graduate studies and internships. Expect a fair amount of mathematics, plus implementation of schemes in GNU Radio and software-defined radios (SDR).')}
-<h3>Roadmap</h3>${FG('road')}
-<h2>Course modules</h2><div class="grid">${LECTURES.map((l,i)=>`<a class="lc" href="#${i}">${THUMBS[i]()}<div class="tx"><b>Lecture ${i+2}: ${l.t}</b><span>${BL[i]}</span></div></a>`).join('')}</div>`;
- m.querySelector('#introw').appendChild(widget('sys'));nav();$('#nav').classList.remove('open');scrollTo(0,0)}
+<h3>Roadmap</h3>${FG('road')}`;
+function nav(){const cur=location.hash.slice(1),j=$('#jump');
+ j.innerHTML='<option value="">⌂ Cover page</option>'+LECTURES.map((l,i)=>`<option value="${i}">${done(i)?'✓ ':''}Lecture ${i+1}: ${l.t.replace(/&amp;/g,'&')}</option>`).join('');
+ j.value=cur===''?'':String(Math.min(+cur||0,LECTURES.length-1));j.onchange=e=>{location.hash=e.target.value};
+ $('#prog').textContent=LECTURES.filter((_,i)=>done(i)).length+'/'+LECTURES.length+' lectures complete'}
+function home(){const m=$('#main');
+ m.innerHTML=`<section class="cover"><h1>APSC 270 – Signals and Communication Systems</h1>
+<div class="card inst"><div><b>Dr. Anas Chaaban, P.Eng.</b><br>School of Engineering, University of British Columbia (UBC)<br>✉ <a href="mailto:anas.chaaban@ubc.ca">anas.chaaban@ubc.ca</a></div></div>
+<div class="hero">${FIG.hero()}</div></section>
+<h2>Lectures</h2><div class="grid">${LECTURES.map((l,i)=>`<a class="lc" href="#${i}">${THUMBS[i]()}<div class="tx"><b>Lecture ${i+1}: ${l.t}</b><span>${BL[i]}</span></div></a>`).join('')}</div>`;
+ nav();scrollTo(0,0)}
 function show(){if(location.hash.slice(1)==='')return home();const i=Math.min(+(location.hash.slice(1))||0,LECTURES.length-1),L=LECTURES[i],m=$('#main');
- m.innerHTML=`<h2>Lecture ${i+2}: ${L.t}</h2><div class="thumb">${THUMBS[i]()}</div><div class="card"><ul>${L.pts.map(p=>`<li>${p}</li>`).join('')}</ul></div>`;
- if(L.w)m.appendChild(widget(L.w));m.appendChild(quiz(i));
+ m.innerHTML=`<h2>Lecture ${i+1}: ${L.t}</h2><div class="thumb">${THUMBS[i]()}</div>`+(L.intro?introHTML():`<div class="card"><ul>${L.pts.map(p=>`<li>${p}</li>`).join('')}</ul></div>`);
+ if(L.intro)m.querySelector('#introw').appendChild(widget(L.w));else if(L.w)m.appendChild(widget(L.w));m.appendChild(quiz(i));
  const p=document.createElement('div');p.className='pn';p.innerHTML=(i?`<a href="#${i-1}">← Previous</a>`:'<a href="#">← Cover</a>')+(i<LECTURES.length-1?`<a href="#${i+1}">Next →</a>`:'<span></span>');m.appendChild(p);
  m.insertAdjacentHTML('beforeend','<p class="mut">Study notes based on APSC 270 lecture slides (Dr. A. Chaaban, UBC). Always defer to the original slides and course materials.</p>');
- nav();$('#nav').classList.remove('open');scrollTo(0,0)}
+ nav();scrollTo(0,0)}
 
 const SIG=[["Rectangle Π(t)",t=>Math.abs(t)<=.5?1:0],["Triangle Λ(t)",t=>Math.max(0,1-Math.abs(t))],["Ramp t on (0,1)",t=>t>0&&t<1?t:0],["Decaying e^(−t)·u(t)",t=>t>=0?Math.exp(-t):0]],SN=SIG.map(s=>s[0]);
 let sd=7;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647,NZ=Array.from({length:722},()=>Math.sqrt(-2*Math.log(rnd()+1e-9))*Math.cos(2*Math.PI*rnd()));
@@ -294,7 +302,6 @@ iq:{t:"Try it: I/Q multiplexing and LO phase error",h:320,sl:[["p","Receiver LO 
   plot(c,[{f:t=>mi(t)/2,c:R,d:[5,4]},{f:t=>(mi(t)*Math.cos(p)+mq(t)*Math.sin(p))/2,c:A}],0,2,-.7,.7,[0,155]);
   plot(c,[{f:t=>mq(t)/2,c:R,d:[5,4]},{f:t=>(-mi(t)*Math.sin(p)+mq(t)*Math.cos(p))/2,c:G}],0,2,-.7,.7,[165,155]);
   return`Two independent messages share one carrier: x(t)=m_I cos(2πf_ct)−m_Q sin(2πf_ct). Top: I-branch output (blue) vs the target m_I/2 (red dashed). Bottom: Q-branch (green) vs m_Q/2. With φ=0 there is no interference; with φ=${v.p}° each branch loses cos φ=${Math.cos(p).toFixed(2)} of its message and picks up sin φ=${Math.sin(p).toFixed(2)} of the other.`}}});
-$('#menu').onclick=()=>$('#nav').classList.toggle('open');
 addEventListener('hashchange',show);show();
 </script>
 </body></html>
